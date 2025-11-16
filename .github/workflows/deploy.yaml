@@ -34,5 +34,12 @@ jobs:
           --name gha-demo-app \
           --resource-group ${{ secrets.AZURE_RG }} \
           --image ${{ secrets.ACR_NAME }}.azurecr.io/gha-demo-app:latest
+    - name: Show Container App URL
+      run: |
+        az containerapp show \
+          --name gha-demo-app \
+          --resource-group ${{ secrets.AZURE_RG }} \
+          --query properties.configuration.ingress.fqdn \
+          -o tsv
 
 
