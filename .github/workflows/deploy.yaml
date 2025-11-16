@@ -1,0 +1,37 @@
+on:
+  push:
+    branches:
+      - flasktest
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+    - name: Configure gcloud
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Build and Push Docker Image
+      run: |
+        gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/gha-demo-app
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy gha-demo-app \
+        --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/gha-demo-app \
+        --region asia-south1 \
+        --platform managed \
+        --allow-unauthenticated
