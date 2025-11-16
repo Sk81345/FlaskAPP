@@ -20,16 +20,17 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-
-
+    
     - name: Build and Push Docker Image
       run: |
-        gcloud builds submit --tag gcr.io/${{ secrets.GCP_PROJECT_ID }}/gha-demo-app
-
-    - name: Deploy to Cloud Run
+        az acr build \
+          --registry ${{ secrets.ACR_NAME }} \
+          --image gha-demo-app:latest \
+          .
+    
+    - name: Deploy to Azure Container Apps
       run: |
-        gcloud run deploy gha-demo-app \
-        --image gcr.io/${{ secrets.GCP_PROJECT_ID }}/gha-demo-app \
-        --region asia-south1 \
-        --platform managed \
-        --allow-unauthenticated
+        az containerapp update \
+          --name gha-demo-app \
+          --resource-group ${{ secrets.AZURE_RG }} \
+          --image ${{ secrets.ACR_NAME }}.azurecr.io/gha-demo-app:latest
