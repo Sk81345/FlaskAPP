@@ -27,11 +27,12 @@ jobs:
           --registry ${{ secrets.ACR_NAME }} \
           --image gha-demo-app:latest \
           .
-    
+        
     - name: Deploy to Azure Container Apps
       run: |
         az containerapp update \
           --name gha-demo-app \
           --resource-group ${{ secrets.AZURE_RG }} \
           --image ${{ secrets.ACR_NAME }}.azurecr.io/gha-demo-app:latest
+
 
